@@ -1,0 +1,115 @@
+<html>
+	<head>
+	<style>
+		.button
+		{
+			font-size:20px;
+			border:1px solid black;
+			padding-left:5px;
+			padding-right:5px;
+			cursor:pointer;
+		}
+		.value
+		{
+			border:1px solid black;
+			font-size:20px;
+			cursor:default;
+		}
+	</style>
+	<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+	<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+	<script type="text/javascript" src="./jquery.tablesorter/jquery.tablesorter.js"></script>
+	<link rel="stylesheet" href="./blue/style.css" type="text/css" media="print, projection, screen" />
+		<title>
+		</title>
+	</head>
+	<body>
+		<button onClick="AddPlayer()">Add Player</button>
+		<table id="myTable" class="tablesorter"> 
+			<thead> 
+				<tr> 
+					<th>Name</th> 
+					<th>Level</th> 
+					<th>Gear</th> 
+					<th>Total</th>    
+				</tr> 
+			</thead> 
+			<tbody id="myBody"> 
+		 
+			</tbody> 
+		</table> 
+		<script>
+			function generateUUID() {
+				var d = new Date().getTime();
+				var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+					var r = (d + Math.random()*16)%16 | 0;
+					d = Math.floor(d/16);
+					return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+				});
+				return uuid;
+			}
+			
+			function Player(Name) 
+			{
+				this.name = Name;
+				this.level = 1;
+				this.gear=0;
+				this.uuid=generateUUID();
+				this.changeLevelBy=function(by){this.level=this.level+by;$('#'+'level-'+this.uuid).children('.label').text(this.level);$('#'+'total-'+this.uuid).text(this.level+this.gear)};
+				this.changeGearBy=function(by){this.gear=this.gear+by;$('#'+'gear-'+this.uuid).children('.label').text(this.gear);$('#'+'total-'+this.uuid).text(this.level+this.gear)};
+				this.AsTableRow=function()
+				{
+					return $('<TR>').append
+						(
+							$('<TD>').text(this.name).append($('<span>').text('X').addClass('button').click(function(){$(this).parent().parent().remove()})).attr('id','name-'+this.uuid)
+						).append
+						(
+							$('<TD>').append
+								(
+									$('<span>').text(this.level).addClass('label')
+								).append
+								(
+									$('<span>').text('+').addClass('button').click(function(){Players[$(this).parent().parent().attr('id')].changeLevelBy(1)})
+								).append
+								(	
+									$('<span>').text('-').addClass('button').click(function(){Players[$(this).parent().parent().attr('id')].changeLevelBy(-1)})
+								).attr('id','level-'+this.uuid)
+						).append
+						(
+							$('<TD>').append
+								(
+									$('<span>').text(this.gear).addClass('label')
+								).append
+								(
+									$('<span>').text('+').addClass('button').click(function(){Players[$(this).parent().parent().attr('id')].changeGearBy(1)})
+								).append
+								(	
+									$('<span>').text('-').addClass('button').click(function(){Players[$(this).parent().parent().attr('id')].changeGearBy(-1)})
+								).attr('id','gear-'+this.uuid)
+						).append
+						(
+							$('<TD>').text(this.gear+this.level).attr('id','total-'+this.uuid)
+						).attr('id',this.uuid)
+				}
+				return this;
+			}
+			
+			var Players = {};
+			
+			function AddPlayer()
+			{
+					var name = prompt("Please enter name", "Ohad Is Knig");
+					var _player = new Player(name);
+					Players[_player.uuid]=_player;
+					$('#myTable').append(_player.AsTableRow());					
+			}
+			
+			$(document).ready(function() 
+				{ 
+					$("#myTable").tablesorter(); 
+				} 
+			); 
+			
+		</script>
+	</body>
+</html>
